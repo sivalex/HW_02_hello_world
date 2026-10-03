@@ -1,16 +1,16 @@
 #include <linux/init.h>
-#include <linux/module.h>
 #include <linux/kernel.h>
+#include <linux/module.h>
 
 static int __init hello_init(void)
 {
-    pr_info("hello_world:init\n");
-    return 0;
+	pr_info("hello_world:init\n");
+	return 0;
 }
 
 static void __exit hello_exit(void)
 {
-    pr_info("hello_world:exit\n");
+	pr_info("hello_world:exit\n");
 }
 
 module_init(hello_init);
