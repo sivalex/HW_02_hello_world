@@ -4,13 +4,13 @@
 
 static int __init hello_init(void)
 {
-	pr_info("hello_world:init\n");
+	pr_info("%s:init\n", KBUILD_MODNAME);
 	return 0;
 }
 
 static void __exit hello_exit(void)
 {
-	pr_info("hello_world:exit\n");
+	pr_info("%s:exit\n", KBUILD_MODNAME);
 }
 
 module_init(hello_init);
