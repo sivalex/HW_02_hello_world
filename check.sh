@@ -12,7 +12,11 @@ set_ch_val()
     sudo sh -c "echo $1 > /sys/module/$module_name/parameters/ch_val"
 }
 
-echo "Check script started..."
+sudo rmmod hello_world.ko
+sudo insmod hello_world.ko
+
+my_str=$(cat /sys/module/$module_name/parameters/my_str)
+echo "my_str before $my_str"
 
 chars="48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21"
 
@@ -23,4 +27,5 @@ for ch_val in $chars; do
     index=$((index+1))
 done
 
-echo "Check script finished..."
+my_str=$(cat /sys/module/$module_name/parameters/my_str)
+echo "my_str after $my_str"

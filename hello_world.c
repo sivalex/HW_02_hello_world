@@ -16,91 +16,84 @@ static bool ch_val_changed = false;
 #define MY_STR_SIZE 13
 static char my_str[MY_STR_SIZE];
 
-
 static void try_update_my_str(void)
 {
-    if (idx_changed && ch_val_changed) {
-	my_str[idx] = ch_val;
-	idx_changed = false;
-	ch_val_changed = false;
-    }
+	if (idx_changed && ch_val_changed) {
+		my_str[idx] = ch_val;
+		idx_changed = false;
+		ch_val_changed = false;
+	}
 }
 
 static int idx_set(const char *val, const struct kernel_param *kp)
 {
-    int ret = 0;
-    u8 tmp = 0;
-    ret = kstrtou8(val, 10, &tmp);
-    if (ret) {
-        pr_err("kst_error!\n");
-    } else {
-	if (tmp>12) {
-	    pr_err("value for idx must be from 0 to 12! you try to set %d\n", tmp);
+	int ret = 0;
+	u8 tmp = 0;
+	ret = kstrtou8(val, 10, &tmp);
+	if (ret) {
+		pr_err("kst_error!\n");
 	} else {
-	    idx = tmp;
-            pr_info("set idx value to %d\n", idx);
-	    idx_changed = true;
-	    try_update_my_str();
+		if (tmp > 12) {
+			pr_err("value for idx must be from 0 to 12! you try to set %d\n",
+			       tmp);
+		} else {
+			idx = tmp;
+			pr_info("set idx value to %d\n", idx);
+			idx_changed = true;
+			try_update_my_str();
+		}
 	}
-    }
-    return ret;
+	return ret;
 }
 
 static int idx_get(char *val, const struct kernel_param *kp)
 {
-    return sprintf(val, "%d\n", idx);
+	return sprintf(val, "%d\n", idx);
 }
 
-static const struct kernel_param_ops idx_ops =
-{
-    .set = idx_set,
-    .get = idx_get
-};
+static const struct kernel_param_ops idx_ops = { .set = idx_set,
+						 .get = idx_get };
 
 static int ch_val_set(const char *val, const struct kernel_param *kp)
 {
-    int ret = 0;
-    u8 tmp = 0;
-    ret = kstrtou8(val, 16, &tmp);
-    if (ret) {
-        pr_err("kst_error!\n");
-    } else {
-	if (tmp<0x20 || tmp>0x7e) {
-	    pr_err("value for ch_val must be from 0x20 to 0x7e! you try to set 0x%02x\n", tmp);
-	    ret = EINVAL;
+	int ret = 0;
+	u8 tmp = 0;
+	ret = kstrtou8(val, 16, &tmp);
+	if (ret) {
+		pr_err("kst_error!\n");
 	} else {
-	    ch_val = tmp;
-            pr_info("set ch_val value to char: %c, hex: 0x%02x\n", ch_val, ch_val);
-	    ch_val_changed = true;
-	    try_update_my_str();
+		if (tmp < 0x20 || tmp > 0x7e) {
+			pr_err("value for ch_val must be from 0x20 to 0x7e! you try to set 0x%02x\n",
+			       tmp);
+			ret = EINVAL;
+		} else {
+			ch_val = tmp;
+			pr_info("set ch_val value to char: %c, hex: 0x%02x\n",
+				ch_val, ch_val);
+			ch_val_changed = true;
+			try_update_my_str();
+		}
 	}
-    }
-    return ret;
+	return ret;
 }
 
 static int ch_val_get(char *val, const struct kernel_param *kp)
 {
-    //return sprintf(val, "Char: %c, Hex: 0x%02x\n", ch_val, ch_val);
-    return sprintf(val, "%c\n", ch_val);
+	//return sprintf(val, "Char: %c, Hex: 0x%02x\n", ch_val, ch_val);
+	return sprintf(val, "%c\n", ch_val);
 }
 
-static const struct kernel_param_ops ch_val_ops =
-{
-    .set = ch_val_set,
-    .get = ch_val_get
-};
+static const struct kernel_param_ops ch_val_ops = { .set = ch_val_set,
+						    .get = ch_val_get };
 
 static int my_str_get(char *val, const struct kernel_param *kp)
 {
-    pr_info("my_str_get");
-    //return scnprintf(val, MY_STR_SIZE+1, "%s\n", my_str);
-    return sprintf(val, "%s\n", my_str);
+	pr_info("my_str_get");
+	//return scnprintf(val, MY_STR_SIZE+1, "%s\n", my_str);
+	return sprintf(val, "%s\n", my_str);
 }
 
-static const struct kernel_param_ops my_str_ops =
-{
-    .get = my_str_get
-};
+static const struct kernel_param_ops my_str_ops = { .get = my_str_get };
 
 module_param_cb(idx, &idx_ops, &idx, 0644);
 module_param_cb(ch_val, &ch_val_ops, &ch_val, 0644);
