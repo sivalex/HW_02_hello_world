@@ -5,12 +5,26 @@
 #include <linux/module.h>
 
 // valid value range: from 0 to 13
-static u8 idx = 0;
+static u8 idx = 0xff;
+static bool idx_changed = false;
 
 // valid value range: from 0x20 to 0x7e
 static u8 ch_val = 0x0;
+static bool ch_val_changed = false;
 
-//static charp my_str = NULL;
+// output, read only
+#define MY_STR_SIZE 13
+static char my_str[MY_STR_SIZE];
+
+
+static void try_update_my_str(void)
+{
+    if (idx_changed && ch_val_changed) {
+	my_str[idx] = ch_val;
+	idx_changed = false;
+	ch_val_changed = false;
+    }
+}
 
 static int idx_set(const char *val, const struct kernel_param *kp)
 {
@@ -20,11 +34,13 @@ static int idx_set(const char *val, const struct kernel_param *kp)
     if (ret) {
         pr_err("kst_error!\n");
     } else {
-	if (tmp>13) {
-	    pr_err("value for idx must be from 0 to 13! you try to set %d\n", tmp);
+	if (tmp>12) {
+	    pr_err("value for idx must be from 0 to 12! you try to set %d\n", tmp);
 	} else {
 	    idx = tmp;
             pr_info("set idx value to %d\n", idx);
+	    idx_changed = true;
+	    try_update_my_str();
 	}
     }
     return ret;
@@ -55,6 +71,8 @@ static int ch_val_set(const char *val, const struct kernel_param *kp)
 	} else {
 	    ch_val = tmp;
             pr_info("set ch_val value to char: %c, hex: 0x%02x\n", ch_val, ch_val);
+	    ch_val_changed = true;
+	    try_update_my_str();
 	}
     }
     return ret;
@@ -72,18 +90,30 @@ static const struct kernel_param_ops ch_val_ops =
     .get = ch_val_get
 };
 
+static int my_str_get(char *val, const struct kernel_param *kp)
+{
+    pr_info("my_str_get");
+    //return scnprintf(val, MY_STR_SIZE+1, "%s\n", my_str);
+    return sprintf(val, "%s\n", my_str);
+}
+
+static const struct kernel_param_ops my_str_ops =
+{
+    .get = my_str_get
+};
+
 module_param_cb(idx, &idx_ops, &idx, 0644);
 module_param_cb(ch_val, &ch_val_ops, &ch_val, 0644);
-//module_param_cb(my_str, &my_str_ops, &my_str, 0444);
-
+module_param_cb(my_str, &my_str_ops, &my_str, 0444);
 
 MODULE_PARM_DESC(idx, "Индекс в массиве");
 MODULE_PARM_DESC(ch_val, "ASCII-код видимого символа");
-//MODULE_PARM_DESC(my_str, "Строка-результат");
+MODULE_PARM_DESC(my_str, "Строка-результат");
 
 static int __init hello_init(void)
 {
 	pr_info("init\n");
+	memset(my_str, 'X', MY_STR_SIZE);
 	return 0;
 }
 
