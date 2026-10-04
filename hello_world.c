@@ -49,7 +49,7 @@ static int ch_val_set(const char *val, const struct kernel_param *kp)
     if (ret) {
         pr_err("kst_error!\n");
     } else {
-	if (tmp<0x20 && tmp>0x7e) {
+	if (tmp<0x20 || tmp>0x7e) {
 	    pr_err("value for ch_val must be from 0x20 to 0x7e! you try to set 0x%02x\n", tmp);
 	    ret = EINVAL;
 	} else {
@@ -62,7 +62,8 @@ static int ch_val_set(const char *val, const struct kernel_param *kp)
 
 static int ch_val_get(char *val, const struct kernel_param *kp)
 {
-    return sprintf(val, "Char: %c, Hex: 0x%02x\n", ch_val, ch_val);
+    //return sprintf(val, "Char: %c, Hex: 0x%02x\n", ch_val, ch_val);
+    return sprintf(val, "%c\n", ch_val);
 }
 
 static const struct kernel_param_ops ch_val_ops =
