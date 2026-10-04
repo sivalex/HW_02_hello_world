@@ -17,14 +17,14 @@ remove:
 
 install:
 	cp $(MODULE_NAME).ko /lib/modules/$(shell uname -r)
-#	cp $(MODULE_NAME).conf /etc/modprobe.d/
+	cp $(MODULE_NAME).conf /etc/modprobe.d/
 	depmod -a
 	modprobe $(MODULE_NAME)
 
 uninstall:
 	modprobe -r $(MODULE_NAME)
 	rm -f /lib/modules/$(shell uname -r)/$(MODULE_NAME).ko
-#	rm -f /etc/modules/$(MODULE_NAME).conf
+	rm -f /etc/modules/$(MODULE_NAME).conf
 	depmod -a
 
 clean:
