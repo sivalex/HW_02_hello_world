@@ -34,4 +34,4 @@ format:
 	clang-format -i $(PWD)/*.c
 
 check:
-	$(PWD)/check.sh
+	/bin/sh $(PWD)/check.sh
